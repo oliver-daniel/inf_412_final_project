@@ -1,1 +1,8 @@
 data/*
+
+.vscode
+**/*.RData
+**/*.rdb
+**/*.rdx
+
+paper/*cache/**/*

@@ -5,10 +5,13 @@ knitr::opts_chunk$set(
     warning = FALSE,
     cache = TRUE
 )
+# options(device  = "X11")
+# X11(type = "cairo")
 ```
 
 ```{r libraries}
 library(tidyverse)
+library(sf)
 ```
 
 ```{r fetch-data}
@@ -16,8 +19,25 @@ source("scripts/fetch-data.r")
 ```
 
 ```{r}
-data.businesses |>
+toronto <- data.businesses |>
     filter(`Licence Address Line 3` |> str_starts("M")) |>
-    ggplot(aes(x = Longitude, y = Latitude, color = Category)) +
-    geom_point()
+    filter(Category |> str_detect(paste(
+        c(
+            "RETAIL STORE \\(FOOD\\)"
+            ,"SMOKE SHOP"
+            ,"VAPOUR PRODUCT RETAILER"
+        ),
+        collapse = "|"
+    )))
+
+
+ggplot() +
+    # geom_sf(data = data.neighbourhoods) +
+    geom_point(data = toronto, aes(x = Longitude, y = Latitude, color=Category), pch = ".", alpha = .5) +
+    geom_density2d(data = toronto, mapping = aes(x = Longitude, y = Latitude,)) #+
+    # theme(legend.position = "none")
+# ggplot(aes(x = Longitude, y = Latitude)) +
+# # geom_sf(geometry = data.neighbourhoods) +e
+# geom_point(alpha = .1) +
+# geom_density2d()
 ```
