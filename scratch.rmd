@@ -1,0 +1,55 @@
+```{r setup, echo=FALSE}
+knitr::opts_knit$set(root.dir = "../")
+knitr::opts_chunk$set(
+    echo = FALSE,
+    message = FALSE,
+    warning = FALSE,
+    cache = TRUE
+)
+# options(device  = "X11")
+# X11(type = "cairo")
+```
+
+```{r libraries}
+library(tidyverse)
+library(sf)
+```
+
+```{r fetch-data}
+source("scripts/fetch-data.r")
+```
+
+```{r}
+businesses <- data.businesses |>
+    filter(`Licence Address Line 3` |> str_starts("M")) |>
+    filter(Category |> str_detect(paste(
+        c(
+            "RETAIL STORE \\(FOOD\\)",
+            "SMOKE SHOP",
+            "VAPOUR PRODUCT RETAILER"
+        ),
+        collapse = "|"
+    )))
+
+dispensaries <- data.dispensaries |>
+    filter(str_starts(PostalCode, "M")) |>
+    filter(ApplicationStatus == "Authorized to Open")
+```
+
+```{r}
+# Cloropleth of open dispensaries by neighbourhood
+
+dispensaries.sf <- st_as_sf(
+    dispensaries,
+    coords = c("Longitude", "Latitude"), crs = 4326
+)
+
+dispensaries_per_neighbourhood <- data.neighbourhoods |>
+    st_contains(dispensaries.sf) |>
+    lengths()
+
+data.neighbourhoods |>
+    bind_cols("dispensary_count" = grid_intersect) |>
+    ggplot(aes(fill = dispensary_count)) +
+    geom_sf()
+```

@@ -31,7 +31,10 @@ if (!file.exists(POSTAL_CODES_FILEPATH)) {
     download.file(
         "https://www.serviceobjects.com/public/zipcode/ZipCodeFiles.zip", temp
     )
-    data.postal_codes <- read_csv(unz(temp, "CanadianPostalCodes202208.csv"))
+    zipped_files <- unzip(temp, list = TRUE)
+    codes_file <- files[str_starts(files$Name, "CanadianPostalCodes"), "Name"]
+
+    data.postal_codes <- read_csv(unz(temp, codes_file))
     write.csv(data.postal_codes, POSTAL_CODES_FILEPATH)
     unlink(temp)
 } else {
