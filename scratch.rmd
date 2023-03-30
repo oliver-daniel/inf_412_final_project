@@ -51,5 +51,33 @@ dispensaries_per_neighbourhood <- data.neighbourhoods |>
 data.neighbourhoods |>
     bind_cols("dispensary_count" = grid_intersect) |>
     ggplot(aes(fill = dispensary_count)) +
-    geom_sf()
+    geom_sf() +
+    geom_point(
+        data = dispensaries,
+        mapping = aes(x = Longitude, y = Latitude),
+        color = "cyan",
+        size = .5,
+        alpha = .5,
+        inherit.aes = F
+    ) +
+    scale_fill_viridis_c("Dispensaries", option = "magma")
+```
+
+```{r}
+neighbourhoods.sf <- data.neighbourhoods |>
+    # drop_na(Latitude, Longitude) |>
+    st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326)
+
+
+
+data.neighbourhoods |>
+    ggplot() +
+    geom_sf() +
+    geom_sf(data = data.intersections, alpha=.1)
+```
+
+```{r}
+data.intersections |>
+    head(5) |>
+    st_distance(dispensaries.sf |> head(5))
 ```

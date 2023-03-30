@@ -3,6 +3,7 @@ library(sf)
 
 DISPENSARIES_FILEPATH <- "data/acgo_dispensary_data.csv"
 NEIGHBOURHOODS_FILEPATH <- "data/opendata_toronto_neighbourhoods.gpkg"
+INTERSECTIONS_FILEPATH <- "data/opendata_toronto_intersections.gpkg"
 BUSINESSES_FILEPATH <- "data/opendata_toronto_business_licenses.csv"
 POSTAL_CODES_FILEPATH <- "data/postal_codes.csv"
 
@@ -18,12 +19,24 @@ if (!file.exists(DISPENSARIES_FILEPATH)) {
 
 if (!file.exists(NEIGHBOURHOODS_FILEPATH)) {
     download.file(
-        "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/neighbourhoods/resource/987d3c3d-3d93-4bae-adc7-1cdfe1ed34a2/download/Neighbourhoods%20-%204326.gpkg",
+        "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/neighbourhoods/resource/1d38e8b7-65a8-4dd0-88b0-ad2ce938126e/download/Neighbourhoods.geojson",
         NEIGHBOURHOODS_FILEPATH
     )
 } else {
     print("Reading neighbourhood data from existing file")
 }
+
+if (!file.exists(INTERSECTIONS_FILEPATH)) {
+    download.file(
+        "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2c83f641-7808-49ba-b80f-7011851d4e27/resource/e3eecbd9-34b7-44b5-bb57-3de72f2ec393/download/Centreline%20Intersection%20-%204326.gpkg",
+        INTERSECTIONS_FILEPATH
+    )
+} else {
+    print("Reading intersection data from existing file")
+}
+
+data.intersections <- st_read(INTERSECTIONS_FILEPATH)
+
 data.neighbourhoods <- st_read(NEIGHBOURHOODS_FILEPATH)
 
 if (!file.exists(POSTAL_CODES_FILEPATH)) {
