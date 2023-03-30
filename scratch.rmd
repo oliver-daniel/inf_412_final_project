@@ -49,7 +49,7 @@ dispensaries_per_neighbourhood <- data.neighbourhoods |>
     lengths()
 
 data.neighbourhoods |>
-    bind_cols("dispensary_count" = grid_intersect) |>
+    bind_cols("dispensary_count" = dispensaries_per_neighbourhood) |>
     ggplot(aes(fill = dispensary_count)) +
     geom_sf() +
     geom_point(

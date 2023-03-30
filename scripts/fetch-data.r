@@ -2,8 +2,8 @@ library(tidyverse)
 library(sf)
 
 DISPENSARIES_FILEPATH <- "data/acgo_dispensary_data.csv"
-NEIGHBOURHOODS_FILEPATH <- "data/opendata_toronto_neighbourhoods.gpkg"
-INTERSECTIONS_FILEPATH <- "data/opendata_toronto_intersections.gpkg"
+NEIGHBOURHOODS_FILEPATH <- "data/opendata_toronto_neighbourhoods.geojson"
+# INTERSECTIONS_FILEPATH <- "data/opendata_toronto_intersections.gpkg"
 BUSINESSES_FILEPATH <- "data/opendata_toronto_business_licenses.csv"
 POSTAL_CODES_FILEPATH <- "data/postal_codes.csv"
 
@@ -26,7 +26,7 @@ if (!file.exists(NEIGHBOURHOODS_FILEPATH)) {
     print("Reading neighbourhood data from existing file")
 }
 
-if (!file.exists(INTERSECTIONS_FILEPATH)) {
+if (FALSEand!file.exists(INTERSECTIONS_FILEPATH)) {
     download.file(
         "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/2c83f641-7808-49ba-b80f-7011851d4e27/resource/e3eecbd9-34b7-44b5-bb57-3de72f2ec393/download/Centreline%20Intersection%20-%204326.gpkg",
         INTERSECTIONS_FILEPATH
@@ -45,7 +45,7 @@ if (!file.exists(POSTAL_CODES_FILEPATH)) {
         "https://www.serviceobjects.com/public/zipcode/ZipCodeFiles.zip", temp
     )
     zipped_files <- unzip(temp, list = TRUE)
-    codes_file <- files[str_starts(files$Name, "CanadianPostalCodes"), "Name"]
+    codes_file <- zipped_files[str_starts(zipped_files$Name, "CanadianPostalCodes"), "Name"]
 
     data.postal_codes <- read_csv(unz(temp, codes_file))
     write.csv(data.postal_codes, POSTAL_CODES_FILEPATH)
