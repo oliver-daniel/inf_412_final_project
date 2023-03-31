@@ -13,16 +13,119 @@ knitr::opts_chunk$set(
 ```{r libraries}
 library(tidyverse)
 library(sf)
+library(wesanderson)
+library(ggplot2)
 ```
 
 ```{r fetch-data}
 source("scripts/fetch-data.r")
 ```
+# Introduction
 
-```{r}
-businesses <- data.businesses |>
-    filter(`Licence Address Line 3` |> str_starts("M")) |>
-    filter(Category |> str_detect(paste(
+
+## Summaries of Data sets
+- overall reason for summaries and introduction to this section
+- 
+### Busisnesses
+- background on businesses
+- just relating what is noticed
+- reason for data set
+- describe distribution if we can
+```{r businesses}
+library(skimr)
+library(modelsummary)
+
+#Numberical Summary
+look_at_businesses <-
+  datasummary_skim(clean_businesses)
+look_at_businesses
+
+#Numberical Correlation (No categorical avaliable)
+businesses_correlation <-
+  datasummary_correlation(clean_businesses)
+businesses_correlation
+
+```
+
+### Dispensaries
+- background on dispensary data:
+- relaying the info on what is noticed
+- reason for data set
+- describe distribution if we can
+```{r dispensaries}
+# Numerical summary
+look_at_dispensaries <-
+  datasummary_skim(clean_dispensaries)
+look_at_dispensaries
+
+# Numerical Correlation
+dispensaries_correlation <-
+  datasummary_correlation(clean_dispensaries)
+dispensaries_correlation
+
+# Categorical summaries
+disp_cat <-
+  datasummary_skim(clean_dispensaries, "categorical")
+disp_cat
+```
+
+### Neighbourhoods
+- background on neighbourhood data
+- relaying the info on what is noticed
+- reason for data set
+- describe distribution if we can
+```{r neighbourhoods}
+# Categorical Data only avaliable 
+look_at_neighbourhoods <-
+  datasummary_skim(clean_neighbourhoods, "categorical")
+look_at_neighbourhoods
+```
+
+### Intersections
+- background on intersections data
+- relaying the info on what is noticed
+- reason for data set
+- describe distribution if we can
+```{r intersections}
+
+# Numerical Summary
+new_table <-
+  datasummary_skim(clean_intersections)
+new_table
+
+
+# Categorical Summary
+look_at_intersections <-
+  datasummary_skim(clean_intersections, "categorical")
+look_at_intersections
+
+```
+
+### Postal Codes
+- background on postal code data
+- relaying the info on what is noticed
+- reason for data set
+- describe distribution if we can
+```{r postalcodes}
+# Numerical Summary
+look_at_postal_codes <-
+  datasummary_skim(clean_postal_codes)
+look_at_postal_codes
+
+# Correlation table postal code
+the_codes<-
+  datasummary_correlation(clean_postal_codes)
+the_codes
+
+```
+
+## Methodology
+```{r extrascrubbing}
+# this section is for fixing the datasets to our needs
+businesses <- clean_businesses |>
+    filter(`licence_address_line_3` |> 
+             str_starts("M")) |>
+  filter(category |> str_detect(paste(
         c(
             "RETAIL STORE \\(FOOD\\)",
             "SMOKE SHOP",
@@ -31,11 +134,14 @@ businesses <- data.businesses |>
         collapse = "|"
     )))
 
-dispensaries <- data.dispensaries |>
-    filter(str_starts(PostalCode, "M")) |>
-    filter(ApplicationStatus == "Authorized to Open")
+dispensaries <- clean_dispensaries |>
+    filter(str_starts(postal_code, "M")) |>
+    filter(application_status == "Authorized to Open")
+
 ```
 
+
+## Visualizations
 ```{r}
 # Cloropleth of open dispensaries by neighbourhood
 
@@ -48,6 +154,10 @@ dispensaries_per_neighbourhood <- data.neighbourhoods |>
     st_contains(dispensaries.sf) |>
     lengths()
 
+# colour code from: https://github.com/karthik/wesanderson
+
+pal <- wes_palette("IsleofDogs2", 100, type = "continuous")
+
 data.neighbourhoods |>
     bind_cols("dispensary_count" = dispensaries_per_neighbourhood) |>
     ggplot(aes(fill = dispensary_count)) +
@@ -55,29 +165,23 @@ data.neighbourhoods |>
     geom_point(
         data = dispensaries,
         mapping = aes(x = Longitude, y = Latitude),
-        color = "cyan",
+        color = "skyblue",
         size = .5,
         alpha = .5,
         inherit.aes = F
     ) +
-    scale_fill_viridis_c("Dispensaries", option = "magma")
+    scale_fill_gradientn("Dispensaries", colours = pal)
+   
 ```
 
-```{r}
-neighbourhoods.sf <- data.neighbourhoods |>
-    # drop_na(Latitude, Longitude) |>
-    st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326)
+## Analysis and Result
 
 
 
-data.neighbourhoods |>
-    ggplot() +
-    geom_sf() +
-    geom_sf(data = data.intersections, alpha=.1)
-```
 
-```{r}
-data.intersections |>
-    head(5) |>
-    st_distance(dispensaries.sf |> head(5))
-```
+## Discussion
+
+
+
+
+## Conclusion
