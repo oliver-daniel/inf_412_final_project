@@ -16,7 +16,7 @@ library(sf)
 ```
 
 ```{r fetch-data}
-source("scripts/fetch-data.r")
+source("scripts/fetch-data.r") |> invisible()
 ```
 
 ```{r}
@@ -34,6 +34,10 @@ businesses <- data.businesses |>
 dispensaries <- data.dispensaries |>
     filter(str_starts(PostalCode, "M")) |>
     filter(ApplicationStatus == "Authorized to Open")
+
+dispensaries |>
+    mutate(fsa = substring(PostalCode, 1, 3)) |>
+    count(fsa)
 ```
 
 ```{r}
@@ -80,4 +84,13 @@ data.neighbourhoods |>
 data.intersections |>
     head(5) |>
     st_distance(dispensaries.sf |> head(5))
+```
+
+```{r}
+
+data.fsas |>
+    filter(str_starts(FSA, 'M')) |>
+    ggplot() +
+    geom_sf() +
+    geom_sf(data = data.dispensaries)
 ```
