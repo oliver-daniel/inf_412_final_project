@@ -2,10 +2,7 @@ library(tidyverse)
 library(sf)
 
 DISPENSARIES_FILEPATH <- "data/acgo_dispensary_data.csv"
-# NEIGHBOURHOODS_FILEPATH <- "data/opendata_toronto_neighbourhoods.geojson"
-# INTERSECTIONS_FILEPATH <- "data/opendata_toronto_intersections.geojson"
 BUSINESSES_FILEPATH <- "data/opendata_toronto_business_licenses.csv"
-# POSTAL_CODES_FILEPATH <- "data/postal_codes.csv"
 FSA_DIRECTORY <- "data/shp"
 
 if (!file.exists(DISPENSARIES_FILEPATH)) {
@@ -18,6 +15,27 @@ if (!file.exists(DISPENSARIES_FILEPATH)) {
     data.dispensaries <- read_csv(DISPENSARIES_FILEPATH)
 }
 
+
+
+if (!file.exists(BUSINESSES_FILEPATH)) {
+    data.businesses <- read_csv(
+        "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/54bddc5e-92d9-4102-89c1-43e82f8f4d2d/download/Business%20licences%20data.csv"
+    )
+    write.csv(data.businesses, BUSINESSES_FILEPATH)
+} else {
+    print("Reading businesses data from existing file")
+    data.businesses <- read_csv((BUSINESSES_FILEPATH))
+}
+
+# IMPORTANT: see README for instructions on properly installing FSA shapefiles.
+data.fsas <- read_sf("data/shp", "ONfsa")
+
+
+
+#### GRAVEYARD OF DATA PAST ####
+
+# NEIGHBOURHOODS_FILEPATH <- "data/opendata_toronto_neighbourhoods.geojson"
+# INTERSECTIONS_FILEPATH <- "data/opendata_toronto_intersections.geojson"
 # if (!file.exists(NEIGHBOURHOODS_FILEPATH)) {
 #     download.file(
 #         "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/neighbourhoods/resource/1d38e8b7-65a8-4dd0-88b0-ad2ce938126e/download/Neighbourhoods.geojson",
@@ -55,16 +73,3 @@ if (!file.exists(DISPENSARIES_FILEPATH)) {
 #     print("Reading postal codes data from existing file")
 #     data.postal_codes <- read_csv(POSTAL_CODES_FILEPATH)
 # }
-
-if (!file.exists(BUSINESSES_FILEPATH)) {
-    data.businesses <- read_csv(
-        "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/57b2285f-4f80-45fb-ae3e-41a02c3a137f/resource/54bddc5e-92d9-4102-89c1-43e82f8f4d2d/download/Business%20licences%20data.csv"
-    )
-    write.csv(data.businesses, BUSINESSES_FILEPATH)
-} else {
-    print("Reading businesses data from existing file")
-    data.businesses <- read_csv((BUSINESSES_FILEPATH))
-}
-
-# IMPORTANT: see README for instructions on properly installing FSA shapefiles.
-data.fsas <- read_sf('data/shp', 'ONfsa')
