@@ -1,14 +1,3 @@
-```{r setup, echo=FALSE}
-knitr::opts_knit$set(root.dir = "../")
-knitr::opts_chunk$set(
-    echo = FALSE,
-    message = FALSE,
-    warning = FALSE,
-    cache = TRUE
-)
-# options(device  = "X11")
-# X11(type = "cairo")
-```
 
 ```{r libraries}
 library(tidyverse)
@@ -20,38 +9,79 @@ library(ggplot2)
 ```{r fetch-data}
 source("scripts/fetch-data.r")
 ```
+
 # Introduction
 
+-   Describe the data
+-   Describe how the data sets are used
+-   Research question and hypothesis
 
-## Summaries of Data sets
-- overall reason for summaries and introduction to this section
-- 
-### Busisnesses
-- background on businesses
-- just relating what is noticed
-- reason for data set
-- describe distribution if we can
+```{r extrascrubbing}
+# this section is for fixing the data sets to our needs
+
+dispensaries <- clean_dispensaries |>
+    filter(str_starts(postal_code, "M")) |>
+    filter(application_status == "Authorized to Open")
+
+```
+
+## Methodology
+
+-   Think about the process, considering what we will do
+
+## Result
+
+### Summaries of Data sets
+
+-   overall reason for summaries and introduction to this section
+
+-   
+
+    ### Busisnesses
+
+-   background on businesses
+
+-   just relating what is noticed
+
+-   reason for data set
+
+-   describe distribution if we can
+
 ```{r businesses}
 library(skimr)
 library(modelsummary)
 
-#Numberical Summary
+#Numerical Summary
 look_at_businesses <-
   datasummary_skim(clean_businesses)
 look_at_businesses
 
-#Numberical Correlation (No categorical avaliable)
+#Numerical Correlation (No categorical available)
 businesses_correlation <-
   datasummary_correlation(clean_businesses)
 businesses_correlation
 
+#Cleaning Businesses even further
+businesses <- clean_businesses |>
+    filter(`licence_address_line_3` |> 
+             str_starts("M")) |>
+  filter(category |> str_detect(paste(
+        c(
+            "RETAIL STORE \\(FOOD\\)",
+            "SMOKE SHOP",
+            "VAPOUR PRODUCT RETAILER"
+        ),
+        collapse = "|"
+    )))
 ```
 
 ### Dispensaries
-- background on dispensary data:
-- relaying the info on what is noticed
-- reason for data set
-- describe distribution if we can
+
+-   background on dispensary data:
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
 ```{r dispensaries}
 # Numerical summary
 look_at_dispensaries <-
@@ -69,11 +99,13 @@ disp_cat <-
 disp_cat
 ```
 
-### Neighbourhoods
-- background on neighbourhood data
-- relaying the info on what is noticed
-- reason for data set
-- describe distribution if we can
+### Neighborhoods
+
+-   background on neighborhood data
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
 ```{r neighbourhoods}
 # Categorical Data only avaliable 
 look_at_neighbourhoods <-
@@ -82,10 +114,12 @@ look_at_neighbourhoods
 ```
 
 ### Intersections
-- background on intersections data
-- relaying the info on what is noticed
-- reason for data set
-- describe distribution if we can
+
+-   background on intersections data
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
 ```{r intersections}
 
 # Numerical Summary
@@ -102,10 +136,12 @@ look_at_intersections
 ```
 
 ### Postal Codes
-- background on postal code data
-- relaying the info on what is noticed
-- reason for data set
-- describe distribution if we can
+
+-   background on postal code data
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
 ```{r postalcodes}
 # Numerical Summary
 look_at_postal_codes <-
@@ -119,69 +155,40 @@ the_codes
 
 ```
 
-## Methodology
-```{r extrascrubbing}
-# this section is for fixing the datasets to our needs
-businesses <- clean_businesses |>
-    filter(`licence_address_line_3` |> 
-             str_starts("M")) |>
-  filter(category |> str_detect(paste(
-        c(
-            "RETAIL STORE \\(FOOD\\)",
-            "SMOKE SHOP",
-            "VAPOUR PRODUCT RETAILER"
-        ),
-        collapse = "|"
-    )))
+### Visualizations
 
-dispensaries <- clean_dispensaries |>
-    filter(str_starts(postal_code, "M")) |>
-    filter(application_status == "Authorized to Open")
-
-```
-
-
-## Visualizations
 ```{r}
-# Cloropleth of open dispensaries by neighbourhood
+# for some reason I cannot read this anymore
 
 dispensaries.sf <- st_as_sf(
     dispensaries,
     coords = c("Longitude", "Latitude"), crs = 4326
 )
-
 dispensaries_per_neighbourhood <- data.neighbourhoods |>
     st_contains(dispensaries.sf) |>
     lengths()
-
-# colour code from: https://github.com/karthik/wesanderson
-
-pal <- wes_palette("IsleofDogs2", 100, type = "continuous")
-
 data.neighbourhoods |>
-    bind_cols("dispensary_count" = dispensaries_per_neighbourhood) |>
+    bind_cols("dispensary_count" = grid_intersect) |>
     ggplot(aes(fill = dispensary_count)) +
     geom_sf() +
     geom_point(
         data = dispensaries,
         mapping = aes(x = Longitude, y = Latitude),
-        color = "skyblue",
+        color = "cyan",
         size = .5,
         alpha = .5,
         inherit.aes = F
     ) +
-    scale_fill_gradientn("Dispensaries", colours = pal)
-   
+    scale_fill_viridis_c("Dispensaries", option = "magma")
 ```
 
-## Analysis and Result
+```{r}
+
+FSA <- read_sf("data", "ONfsa") |> filter(str_starts(FSA, "M"))
 
 
-
+```
 
 ## Discussion
-
-
-
 
 ## Conclusion
