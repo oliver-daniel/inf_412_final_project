@@ -6,3 +6,4 @@ data/*
 **/*.rdx
 
 **/*cache*
+.Rproj.user
