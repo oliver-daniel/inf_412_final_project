@@ -1,0 +1,194 @@
+
+```{r libraries}
+library(tidyverse)
+library(sf)
+library(wesanderson)
+library(ggplot2)
+```
+
+```{r fetch-data}
+source("scripts/fetch-data.r")
+```
+
+# Introduction
+
+-   Describe the data
+-   Describe how the data sets are used
+-   Research question and hypothesis
+
+```{r extrascrubbing}
+# this section is for fixing the data sets to our needs
+
+dispensaries <- clean_dispensaries |>
+    filter(str_starts(postal_code, "M")) |>
+    filter(application_status == "Authorized to Open")
+
+```
+
+## Methodology
+
+-   Think about the process, considering what we will do
+
+## Result
+
+### Summaries of Data sets
+
+-   overall reason for summaries and introduction to this section
+
+-   
+
+    ### Busisnesses
+
+-   background on businesses
+
+-   just relating what is noticed
+
+-   reason for data set
+
+-   describe distribution if we can
+
+```{r businesses}
+library(skimr)
+library(modelsummary)
+
+#Numerical Summary
+look_at_businesses <-
+  datasummary_skim(clean_businesses)
+look_at_businesses
+
+#Numerical Correlation (No categorical available)
+businesses_correlation <-
+  datasummary_correlation(clean_businesses)
+businesses_correlation
+
+#Cleaning Businesses even further
+businesses <- clean_businesses |>
+    filter(`licence_address_line_3` |> 
+             str_starts("M")) |>
+  filter(category |> str_detect(paste(
+        c(
+            "RETAIL STORE \\(FOOD\\)",
+            "SMOKE SHOP",
+            "VAPOUR PRODUCT RETAILER"
+        ),
+        collapse = "|"
+    )))
+```
+
+### Dispensaries
+
+-   background on dispensary data:
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
+```{r dispensaries}
+# Numerical summary
+look_at_dispensaries <-
+  datasummary_skim(clean_dispensaries)
+look_at_dispensaries
+
+# Numerical Correlation
+dispensaries_correlation <-
+  datasummary_correlation(clean_dispensaries)
+dispensaries_correlation
+
+# Categorical summaries
+disp_cat <-
+  datasummary_skim(clean_dispensaries, "categorical")
+disp_cat
+```
+
+### Neighborhoods
+
+-   background on neighborhood data
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
+```{r neighbourhoods}
+# Categorical Data only avaliable 
+look_at_neighbourhoods <-
+  datasummary_skim(clean_neighbourhoods, "categorical")
+look_at_neighbourhoods
+```
+
+### Intersections
+
+-   background on intersections data
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
+```{r intersections}
+
+# Numerical Summary
+new_table <-
+  datasummary_skim(clean_intersections)
+new_table
+
+
+# Categorical Summary
+look_at_intersections <-
+  datasummary_skim(clean_intersections, "categorical")
+look_at_intersections
+
+```
+
+### Postal Codes
+
+-   background on postal code data
+-   relaying the info on what is noticed
+-   reason for data set
+-   describe distribution if we can
+
+```{r postalcodes}
+# Numerical Summary
+look_at_postal_codes <-
+  datasummary_skim(clean_postal_codes)
+look_at_postal_codes
+
+# Correlation table postal code
+the_codes<-
+  datasummary_correlation(clean_postal_codes)
+the_codes
+
+```
+
+### Visualizations
+
+```{r}
+# for some reason I cannot read this anymore
+
+dispensaries.sf <- st_as_sf(
+    dispensaries,
+    coords = c("Longitude", "Latitude"), crs = 4326
+)
+dispensaries_per_neighbourhood <- data.neighbourhoods |>
+    st_contains(dispensaries.sf) |>
+    lengths()
+data.neighbourhoods |>
+    bind_cols("dispensary_count" = grid_intersect) |>
+    ggplot(aes(fill = dispensary_count)) +
+    geom_sf() +
+    geom_point(
+        data = dispensaries,
+        mapping = aes(x = Longitude, y = Latitude),
+        color = "cyan",
+        size = .5,
+        alpha = .5,
+        inherit.aes = F
+    ) +
+    scale_fill_viridis_c("Dispensaries", option = "magma")
+```
+
+```{r}
+
+FSA <- read_sf("data", "ONfsa") |> filter(str_starts(FSA, "M"))
+
+
+```
+
+## Discussion
+
+## Conclusion

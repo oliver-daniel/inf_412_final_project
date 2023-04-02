@@ -1,0 +1,27 @@
+{
+    "id": "75871006",
+    "path": "C:/Users/Owner/Desktop/inf_412_final_project/scripts/clean-data.R",
+    "project_path": "scripts/clean-data.R",
+    "type": "r_source",
+    "hash": "3603305459",
+    "contents": "",
+    "dirty": false,
+    "created": 1680217677374.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "5,30",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1680218522,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1680218522496,
+    "read_only": false,
+    "read_only_alternatives": []
+}

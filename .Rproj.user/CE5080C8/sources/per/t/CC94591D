@@ -1,0 +1,26 @@
+{
+    "id": "CC94591D",
+    "path": "C:/Users/Owner/Desktop/inf_412_final_project/scripts/fetch-data.r",
+    "project_path": "scripts/fetch-data.r",
+    "type": "r_source",
+    "hash": "3645566631",
+    "contents": "",
+    "dirty": false,
+    "created": 1680219757521.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "1,11",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1680151025,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1680151025,
+    "read_only": false,
+    "read_only_alternatives": []
+}
