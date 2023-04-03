@@ -22,8 +22,13 @@ merged_data_wclass_summary
 cor(potential_predictors)
 
 ###### Graphs ######
-### put all the files under ON under the directory ###
-# Distribution of predictors - (e.g. Sidewalk Cafe)
+### put all the files under 'ON' under the directory ###
+# Distribution of predictors - Scatterplot
+ggplot(data = merged_data_wclass1, aes(x = retail_store_food, y = class)) + 
+  geom_point(alpha = 0.5, size = 0.7,color = "cornflowerblue") + 
+  ggtitle("Scatter plot of retail store (food) vs Class")
+
+## Spatial Visualization ##
 # Load ONfsa.shp
 toronto_fsas <- st_read("ONfsa.shp")
 
@@ -49,19 +54,20 @@ names(toronto_fsas_businesses_x)[names(toronto_fsas_businesses_x) == "entertainm
 
 names(toronto_fsas_businesses_x) <- gsub("[()]", "", names(toronto_fsas_businesses_x))
 
-# Create a choropleth map with ggplot2:
+# Create a choropleth map with ggplot2
+# Sidewalk cafe vs dispensaries
 ggplot() +
   geom_sf(data = toronto_fsas_businesses_x, aes(fill = sidewalk_cafe)) +
   geom_point(
     data = clean_dispensaries3,
     mapping = aes(x = longitude, y = latitude),
-    color = "skyblue",
+    color = "green",
     size = .5,
     alpha = .5,
     inherit.aes = F
   ) +
-  scale_size_continuous(range = c(2, 10)) +
-  scale_fill_gradientn("Sidewalk Cafe", colours = pal)+
+  scale_size_continuous(range = c(2, 10)) + 
+  scale_fill_viridis_c("Sidewalk Cafe", option = "cividis") +
   theme_void()
 
 ###### logistic model ######
