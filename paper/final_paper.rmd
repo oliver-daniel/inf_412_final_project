@@ -4,7 +4,7 @@ author: Nicholas Bosco, Oliver Daniel, Tiago Martins, Yahui Zhang
 subtitle: |
     | for INF 412 (J. Wang)
     | March 26, 2023
-bibliography: 'paper/.bib'
+bibliography: '.bib'
 link-citations: true
 output:
   bookdown::html_document2:
@@ -37,5 +37,5 @@ library(sf)
 ```
 
 ```{r fetch-data}
-source("scripts/fetch-data.r")
+source("scripts/fetch-data.r") |> invisible()
 ```
