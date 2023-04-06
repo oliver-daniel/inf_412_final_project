@@ -1,9 +1,11 @@
 ---
 title: Final Paper
 author: Nicholas Bosco, Oliver Daniel, Tiago Martins, Yahui Zhang
+abstract: |
+  [TODO] The abstract is a short (3-6 sentences) summary of the context, data, motivation, analysis, main results, and conclusion. It should present the main takeaways from your analysis.
 subtitle: |
     | for INF 412 (J. Wang)
-    | March 26, 2023
+    | April 7, 2023
 bibliography: '.bib'
 link-citations: true
 output:
@@ -14,13 +16,14 @@ output:
     number_sections: false
     fig_caption: true
     toc: true
-    toc_depth: 4
+    toc_depth: 2
 header-includes:
   - \usepackage{float}
   - \floatplacement{figure}{H}
   - \floatplacement{table}{H}
 ---
 
+\tableofcontents
 ```{r setup, echo=FALSE}
 knitr::opts_knit$set(root.dir = "../")
 knitr::opts_chunk$set(
@@ -39,3 +42,30 @@ library(sf)
 ```{r fetch-data}
 source("scripts/fetch-data.r") |> invisible()
 ```
+
+# Introduction
+
+# Methodology
+
+# Results
+
+# Discussion
+
+# Conclusion
+Our regression model indicates that at least certain types of businesses are significantly ($p < 0.05$) correlated to the likelihood of dispensaries being opened in an arbitrary FSA-sized region of Toronto. [todo more about AIC, methodologies, etc.] Where higher numbers of dispensaries have already been opened, often the most densely populated regions of the city, co-location of multiple dispensaries in close proximity may be indicative of the longer-term stability of retail cannabis in those areas. However, statistical modelling can prove to be an effective tool in determining which geographic regions may be hospitable to a burgeoning cannabis market, inviting early investment and temporarily enjoying the dividends of low competition.
+
+## Considerations
+### Data is sparse
+Being only a few years removed from legalization, cannabis retail is still in its nascent stages, with even more veteran markets being only a few years its senior. The scene is changing daily, and it is difficult even for licensing bodies like AGCO to track the opening and closing of new locations. This is especially true of black- and grey-market dispensaries, such as First Nations-owned locations which operate on the fringes of treaty law. Although efforts exist to collect and list them, primarily for consumer-facing purposes, there is a distinct lack of verified, up-to-date data on these businesses. It would be of particular interest to investigate these businesses and their market penetration through further study.
+
+### Possible confounding factors
+The scope of our study fails to control for a number of important factors, which could bear significant impact on our statistical findings. These include:
+
+#### Population
+The high variance in population density across the City of Toronto is a latent variable that affects the density of dispensaries and other businesses alike: where there are more people, there will certainly be more establishments to serve them. It is unknown to what extent our model accounts for this, and it is possible that certain signficant factors for dispensary presence in an FSA could be reliant on data only from downtown regions.
+
+#### Regulations and public infrastructure
+Our dataset includes only private business addresses, excluding non-business institutions such as schools, places of worship, and entrances to public and government infrastructure. Future research into the legal constraints of dispensary location – distance from schools, by-law regulations, etc. – may indicate other forces acting on the location of the next dispensary when estimating.
+
+#### Geospatial granularity
+The choice to use the 102 FSAs^[As of 2005.] of the City of Toronto as geographic subdivisions was a largely arbitrary one, looking to balance predictive power with visibility and performance when authoring this paper. Other options considered included the electoral ridings or neighbourhood designations of the city; an arbitrary quadrilateral or hexagonal grid, overlain atop a map of Toronto; and even a Voronoi cell system connecting adjacent street intersections into "blocks". Each of these was deemed unsuitable for varied reasons, but future reproductive studies may wish to test whether our results are repeatable on coarser- or finer-grained geographic scales.
