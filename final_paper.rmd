@@ -73,30 +73,34 @@ This map, ulimately, is fed by a CSV file on the ACGO webserver. The URL to this
 1. The application status must be **Authorized to Open**, i.e., neither rejected nor currently in public notice at the time of download; and
 2. The dispensary's postal code must begin with **M**, which indicates that the address is serviced by a Toronto FSA^[This is a useful heuristic for discriminating what addresses are "within" the City of Toronto.].
 
-Filtering by these two criteria, we were left with a total of `r nrow(clean_dispensaries)` open dispensaries within the City of Toronto, from each of which we retained only the latitude, longitude, and FSA. Other identifying details, such as specific addresses and store names, were discarded.
+Filtering by these two criteria, we were left with a total of `r nrow(clean_dispensaries)` open dispensaries within the City of Toronto, from each of which we retained only the FSA and, for plotting purposes, latitude and longitude. Other identifying details, such as specific addresses and store names, were discarded.
 
 ### Businesses
 Through the Open Data Toronto initiative, the City of Toronto offers to the public a listing of all current business licenses^[i.e., those private business licenses that can be issued at the City's discretion, excluding e.g., liquor and cannabis retail locations.] issued within the Greater Toronto Area. Along with business information and addresses, the data also featured the `category` of business under which the issued license falls. These are also available for download in multiple useful formats, such as CSV.
 
 The data were filtered again by the first letter of their postal code to limit addresses to those within the City of Toronto. However, this still resulted in `r n_distinct(clean_businesses$category)` different business categories. For the purpose of this paper, we limited our data to only `r length(desired_businesses)`:
 
-```{r businessv types}
+```{r business-types}
 tibble(name = desired_businesses) |> knitr::kable()
 ```
 
-For a total of `r fmt(nrow(clean_businesses))` suitable businesses.
+For a total of `r fmt(nrow(clean_businesses))` suitable businesses. For each of these businesses, only the FSA and category were retained.
 
 #### Business types
-
+These ten business types were chosen through a combination of our background research, such as including vapour products in relation to @pedersen_firth_parker_shih_davenport_rodriguez_dunbar_kraus_tucker_damico_et_al._2020; total quantities throughout Toronto to prevent data scarcity issues with prediction; and intuition. [TODO more]
 
 ### Forward Sortation Areas (FSAs)
+Using data drawn from the Census, the Canadian federal government subdivides the geography of Canada into 1,620 unique **Forward Sortation Areas**, or FSAs. Each address found within an FSA shares the same first three characters of their postal code, which makes these three characters a convenient shorthand for a particular region of Canada for purposes of shipping, travel, and more. Conveniently, the City of Toronto is so large that it gets its own prefix for FSAs: M. This is why the dispensary and business license data were filtered to those whose postal codes began with M above.
 
+For the purposes of this paper, a series of shapefiles (DMTA, Inc., 2005) outlining the FSAs was downloaded from the UofT digital library. Although the file was uploaded in 2005 and Toronto's FSAs have changed slightly in 2023, we considered this a minor issue for the purposes of our experiment. Note that, although the source code^[https://github.com/oliver-daniel/inf_412_final_project] for this paper is available online, this shapefile is proprietary and can only be accessed by UofT faculty and staff with valid credentials.
 
 # Methodology
 
 # Results
 
 ## Scatter plots
+For the figures shown below in Figure \@ref(fig:scatterplots), note the free scales for both axes.
+
 ```{r}
 merged_counts <- left_join(
   dispensary_counts,
@@ -106,14 +110,19 @@ merged_counts <- left_join(
 )
 ```
 
-```{r scatterplots, fig.cap="Comparison of FSAs by counts of various business types and dispensaries"}
+```{r scatterplots, fig.cap="The red horizontal line represents the delineation between class-0 and class-1 FSAs: the dots found above the line represent those FSAs which have at least 3 dispensaries, and vice versa."}
 merged_counts |>
   group_by(category) |>
   ggplot(aes(x = n.businesses, y = n.dispensaries)) +
   geom_point(alpha = 0.5, size = 0.7, color = "cornflowerblue") +
   geom_line(aes(y = 3), color = "red") +
   facet_wrap(~category, scales = "free") +
-  labs("TODO")
+  labs(
+    title =
+      "Comparison of FSAs by counts of various business types and dispensaries",
+    x = "Number of business licenses",
+    y = "Number of dispensaries"
+  )
 ```
 
 ## Spatial Visualization
@@ -231,7 +240,12 @@ set.seed(123)
 ctrl <- trainControl(method = "cv", number = 10)
 
 # Train the model using k-fold cross-validation
-fit <- train(factor(class) ~ adult_entertainment_club + entertainment_establishment_nightclub + pawn_shop + sidewalk_cafe + retail_store_food + smoke_shop, data = fsa_counts_pivot, method = "glm", family = binomial, trControl = ctrl)
+fit <- train(
+  factor(class) ~
+    adult_entertainment_club + entertainment_establishment_nightclub +
+    pawn_shop + sidewalk_cafe + retail_store_food + smoke_shop,
+  data = fsa_counts_pivot, method = "glm", family = binomial, trControl = ctrl
+)
 
 # Get results
 print(fit)
@@ -245,7 +259,7 @@ Our regression model indicates that at least certain types of businesses are sig
 
 ## Considerations
 ### Data is sparse
-Being only a few years removed from legalization, cannabis retail is still in its nascent stages, with even more veteran markets being only a few years its senior. The scene is changing daily, and it is difficult even for licensing bodies like AGCO to track the opening and closing of new locations. This is especially true of black- and grey-market dispensaries, such as First Nations-owned locations which operate on the fringes of treaty law. Although efforts exist to collect and list them, primarily for consumer-facing purposes, there is a distinct lack of verified, up-to-date data on these businesses. It would be of particular interest to investigate these businesses and their market penetration through further study.
+Being only a few years removed from legalization, cannabis retail is still in its nascent stages, with even more veteran markets being only a few years its senior. The scene is changing daily, and it is difficult even for licensing bodies like AGCO to track the opening and closing of new locations. This is especially true of grey-market dispensaries, such as First Nations-owned locations which operate on the fringes of treaty law. Although efforts exist to collect and list them, primarily for consumer-facing purposes, there is a distinct lack of verified, up-to-date data on these locations. It would be of particular interest to investigate these locations and their market penetration through further study.
 
 ### Possible confounding factors
 The scope of our study fails to control for a number of important factors, which could bear significant impact on our statistical findings. These include:
