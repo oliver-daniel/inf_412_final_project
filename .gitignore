@@ -1,8 +1,0 @@
-data/*
-
-.vscode
-**/*.RData
-**/*.rdb
-**/*.rdx
-
-**/*cache*
