@@ -27,7 +27,9 @@ knitr::opts_chunk$set(
   echo = FALSE,
   message = FALSE,
   warning = FALSE,
-  cache = FALSE
+  cache = FALSE,
+  fig.width = 12,
+  fig.height = 7
 )
 ```
 
@@ -53,6 +55,15 @@ fmt <- function(n, is_double = FALSE) {
 
 # Introduction
 
+With currently 417 marijuana dispensaries in the city of Toronto, and more likely to be opened in the near future, it begs the question as to where the next dispensary might open. The Alcohol and Gaming Commission of Ontario's iAGCO map displays currently opened dispensaries, and while this information is important to consider, it offers little in the way of ascertaining where a new dispensary might open next. Our group is curious as to what factors influence the location of a new dispensary, particularly the presence of different types of businesses in the area. By performing a logistic regression, our group hopes to predict the likeliest location for a new dispensary based on different types of nearby businesses.
+
+## Background
+First among the two sources we consulted for this assignment was Planning for Marijuana: The Cannabis Conundrum, by Jeremy Németh & Eric Ross. The stated purpose of this article was to explore the local regulation of medical marijuana dispensaries in various states in the US, and by what factors are different zones determined as eligible for new dispensaries, and which factors inhibit the construction of a medical marijuana dispensary (MMD). Of information that was particularly relevant to use, this report found that so-called “buffers” severely diminished an MMD's chances of being built in a given neighborhood. These buffers included the existence of other MMDs, but also “sensitive facilities” such as childcare centres, churches, libraries, parks, and also cinemas, recreation centres, and tobacco stores. Furthermore, these buffer businesses included bars, fast food restaurants, and liquor stores on the basis of resident's concerns of crime and further diminishing property values.
+
+Our second source is Locating Medical and Recreational Cannabis Outlets for Research
+Purposes: Online Methods and Observational Study, an effort to determine the means of locating and observing both licensed and unlicensed dispensaries in Los Angeles County. While the main objective of this study was to determine which of the located dispensaries were open for business, the study also contained additional details regarding the dispensaries in question. Of interest to us was the finding of how 40.6% of identified dispensaries had a tobacco store in close proximity.
+
+
 ## Data
 ### Dispensaries
 In the province of Ontario, all cannabis retail locations must be issued a license by the Alcohol and Gaming Commission of Ontario (AGCO) before opening. If the application is not rejected outright, the location owners must place a 'Public Notice' placard in their proposed store for a 15-day period before the ACGO will consider approving the application and allowing cannabis sales to begin. The ACGO maintains an online directory of all current applications, regardless of status, across the province, as well as a corresponding interactive map.
@@ -67,9 +78,9 @@ Filtering by these two criteria, we were left with a total of `r nrow(clean_disp
 ### Businesses
 Through the Open Data Toronto initiative, the City of Toronto offers to the public a listing of all current business licenses^[i.e., those private business licenses that can be issued at the City's discretion, excluding e.g., liquor and cannabis retail locations.] issued within the Greater Toronto Area. Along with business information and addresses, the data also featured the `category` of business under which the issued license falls. These are also available for download in multiple useful formats, such as CSV.
 
-The data were filtered again by the first letter of their postal code to limit addresses to those within the City of Toronto. However, this still resulted in `r clean_businesses |> pull(category) |> unique() |> length()` different business categories. For the purpose of this paper, we limited our data to only `r length(desired_businesses)`:
+The data were filtered again by the first letter of their postal code to limit addresses to those within the City of Toronto. However, this still resulted in `r n_distinct(clean_businesses$category)` different business categories. For the purpose of this paper, we limited our data to only `r length(desired_businesses)`:
 
-```{r business types}
+```{r businessv types}
 tibble(name = desired_businesses) |> knitr::kable()
 ```
 
@@ -95,7 +106,7 @@ merged_counts <- left_join(
 )
 ```
 
-```{r scatterplots}
+```{r scatterplots, fig.cap="Comparison of FSAs by counts of various business types and dispensaries"}
 merged_counts |>
   group_by(category) |>
   ggplot(aes(x = n.businesses, y = n.dispensaries)) +
@@ -113,24 +124,40 @@ fsas_by_category <- clean_fsas |>
   drop_na(category)
 ```
 
-```{r chloropleths}
+```{r chloropleths, results="hide", fig.keep="all"}
 fsas_by_category |>
-  ggplot() +
-  geom_sf(data = clean_fsas, fill = "black") +
-  geom_sf(aes(fill = pmin(n, 50))) +
-  geom_point(
-    data = clean_dispensaries,
-    mapping = aes(x = longitude, y = latitude),
-    color = "green",
-    size = .25,
-    alpha = .5,
-  ) +
-  scale_fill_viridis_c(option = "magma") +
-  facet_wrap(~category) +
-  labs("TODO")
+  group_by(category) |>
+  do(plots = ggplot(.) +
+    geom_sf(data = clean_fsas, fill = "black") +
+    geom_sf(aes(fill = n)) +
+    geom_point(
+      data = clean_dispensaries,
+      mapping = aes(x = longitude, y = latitude),
+      color = "green",
+      size = .25,
+      alpha = .5,
+    ) +
+    scale_fill_viridis_c(option = "magma") +
+    labs(
+      title = paste(
+        "Count map of",
+        .$category[1] |> str_replace_all("_", " ") |> str_to_sentence(),
+        "per FSA of Toronto",
+        collapse = ""
+      ),
+      y = NULL,
+      x = NULL
+    ) +
+    theme_void() +
+    theme(
+      axis.ticks = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank()
+    )) |>
+  pull(plots)
 ```
-## Data Summary
 
+## Data Summary
 ```{r summary-table, fig.cap="Data Summary",fig.height=7, fig.width=12, echo=FALSE}
 
 # Make a pivot table with counts of all features
