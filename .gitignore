@@ -9,3 +9,6 @@ data/*
 .Rproj.user
 .Rhistory
 .RDataTmp
+
+paper/*
+!paper/.bib
