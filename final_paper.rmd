@@ -1,7 +1,10 @@
 ---
-title: Final Paper
+title: |
+  Budding Industry:
+  Predicting the Next Dispensary Location in Toronto
 author: Nicholas Bosco, Oliver Daniel, Tiago Martins, Yahui Zhang
 subtitle: |
+    | Final paper
     | for INF 412 (J. Wang)
     | April 7, 2023
 abstract: |
@@ -19,7 +22,6 @@ output:
     number_sections: false
     fig_caption: true
   
-
 header-includes:
   - \usepackage{longtable}
   - \usepackage{booktabs}
@@ -27,6 +29,7 @@ header-includes:
   - \floatplacement{figure}{H}
   - \floatplacement{table}{H}
 ---
+
 \tableofcontents
 \newpage
 ```{r setup, echo=FALSE}
@@ -121,7 +124,7 @@ Due to a large number of business categories, we further narrowed down our focus
 
 ## Data Visualization
  
-Scatterplots were created to visualize the relationship between our binary dependent variable (1 if the FSA has more than or equal to 3 dispensaries, 0 if less than 3 dispensaries) and the independent variables (the 10 selected business categories). Additionally, we used the SF package in R to create spatial visualizations, showing the locations of dispensaries and the density of each business type within each FSA based on the assumption that dispensaries propagate beside each other.
+Scatterplots were created to visualize the relationship between our binary dependent variable (1 if the FSA has more than or equal to 3 dispensaries, 0 if less than 3 dispensaries) and the independent variables (the 10 selected business categories). Additionally, we used the SF package in R [@citeSF] to create spatial visualizations, showing the locations of dispensaries and the density of each business type within each FSA based on the assumption that dispensaries propagate beside each other.
 
 ## Logistic Regression Model
 
