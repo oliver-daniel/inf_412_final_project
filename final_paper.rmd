@@ -8,12 +8,12 @@ abstract: |
   Using a number of statistical methods, we train regression models with data regarding the locations of cannabis dispensaries and private businesses in the city of Toronto. These models, in turn, are designed to predict where in the city the next cannabis retail location is most likely to open. After narrowing our scope of investigation to ten types of businesses and the 102 Forward Sortation Areas of Toronto, as used by postal services, our model reports a number of statistically-significant correlations between the presence of given businesses in a region and the establishment of dispensaries. A secondary model is also proposed, simplifying its predictors using the Akaike Information Criterion and K-fold Cross Validation to achieve accuracy in excess of 80%. Limitations to this study are also discussed, including a comparative dearth of dispensary information – in particular those many retail locations in Toronto that are not directly licensed by the province of Ontario – and a lack of other constraints outside of nearby businesses to predict dispensary counts in fairly large geographic areas.
 bibliography: 'paper/.bib'
 link-citations: true
-nocite: "*@"
+nocite: "@*"
 output:
   bookdown::pdf_document2:
     number_sections: false
     fig_caption: true
-    toc: true
+    # toc: true
     toc_depth: 2
   bookdown::html_document2:
     number_sections: false
@@ -27,6 +27,7 @@ header-includes:
   - \floatplacement{table}{H}
 ---
 \tableofcontents
+\newpage
 ```{r setup, echo=FALSE}
 # knitr::opts_knit$set(root.dir = "../")
 knitr::opts_chunk$set(
@@ -45,6 +46,7 @@ library(tidyverse)
 library(janitor)
 library(modelsummary)
 library(caret)
+library(sf)
 ```
 
 ```{r load data, include=FALSE}
@@ -301,6 +303,46 @@ print(fit)
 ## Data Summary
 
 The summary statistics, as shown in Figure \@ref(tab:summary-table), express the distribution of the individual predictors across FSAs with the histogram bars on the side. The `unique` value explains the different kinds of categories within the predictors. What is interesting to note here is that some of the unique values repeat among the different groups. This may be indicative of double counting (i.e. a eating establishment also licensed as a retail food store). The data summary does a sufficient job in expressing the central tendency measures of the individual predictors which comes in handy when trying to understand distributions of the dataset. This graph would not be possible without the help of Skimr and Model Summary [cite skimr and cite model summary].
+
+## The Model
+
+### Before AIC
+Logistical Model Before AIC:
+Before AIC, the model consisted of ten predictors, each being one type of business present within the FSAs The types that were chosen were believed to determine the likelihood of the dispensary being in close proximity within each FSA, as selected through the background research provided above (@nemeth_ross_2014, @pedersen_firth_parker_shih_davenport_rodriguez_dunbar_kraus_tucker_damico_et_al._2020, etc.). When examining the results from the model summary, most of the other predictors like vapor product retailer, payday loan and eating establishment had no effect on the opening of dispensaries whatsoever. It was quite surprising to see smoke shop, and vapour product retailers not be significant in the proximity to dispensaries as the practices of the three businesses are essentially the same; the only difference is what exactly is consumed (tobacco, or juice pods or cannabis). At times semantically people use the words interchangeably (smoking, vaping etc) and the team thought this semantic insight may mean different things for different people.
+
+### After AIC
+
+```{r}
+coefs_2 <- summary(logistic_model2) |> coef()
+exp_coefs_2 <- exp(coefs_2)
+
+results_table <- coefs_2 |>
+  cbind(odds_ratio = exp_coefs_2[, "Estimate"], Name = rownames(coefs_2)) |>
+  as_tibble() |>
+  slice(2:n()) |>
+  select(Name,
+    `Log Odds` = `Estimate`,
+    `Unit Change to Odds Ratio` = odds_ratio,
+    `p-value` = `Pr(>|z|)`
+  ) |>
+  mutate(across(2:4, ~ as.numeric(.) |> round(digits = 3)))
+```
+
+#### Intercept
+**Estimated Log Odds**: `r fmt(coefs_2["(Intercept)", "Estimate"], TRUE)`
+
+**Odds Ratio**: `r fmt(exp_coefs_2["(Intercept)", "Estimate"], TRUE)`
+
+**Explanation**: If no businesses whatsoever are found within an FSA, the odds of a dispensary opening within it are roughly 1%.
+
+#### Other values
+For all other businesses, our updated model exhibits the following predicted changes to odds per unit. That is, for every -- say -- restaurant in an FSA, the likelihood of at least 3 dispensaries being open in that same FSA increase by 1%, to a high degree of statistical significance. Conversely, for every nightclub, the likelihood of the FSA being class-1 in terms of dispensary count decreases by about 15%, though this effect does not have as high a degree of significance with our data. See Table \@ref(tab:coefs-table) below:
+
+```{r coefs-table}
+knitr::kable(results_table, caption = "Note that, despite the AIC optimizations, not all results are statistically significant with $\\alpha = 0.05.$")
+```
+
+
 
 # Conclusion
 Our regression model indicates that at least certain types of businesses are significantly ($p < 0.05$) correlated to the likelihood of dispensaries being opened in an arbitrary FSA-sized region of Toronto. Simple improvements, such as reducing the dimensionality of the prediction space using AIC as a heuristic and K-fold Cross Validation, proved effective in improving predictive power to up to 85. Where higher numbers of dispensaries have already been opened, often the most densely populated regions of the city, co-location of multiple dispensaries in close proximity may indicate the longer-term stability of retail cannabis in those areas. However, statistical modelling can prove to be an effective tool in determining which geographic regions may be hospitable to a burgeoning cannabis market, inviting early investment and temporarily enjoying the dividends of low competition.
