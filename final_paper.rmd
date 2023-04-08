@@ -314,6 +314,14 @@ print(fit)
 
 The summary statistics, as shown in Figure \@ref(tab:summary-table), express the distribution of the individual predictors across FSAs with the histogram bars on the side. The `unique` value explains the different kinds of categories within the predictors. What is interesting to note here is that some of the unique values repeat among the different groups. This may be indicative of double counting (i.e. a eating establishment also licensed as a retail food store). The data summary does a sufficient job in expressing the central tendency measures of the individual predictors which comes in handy when trying to understand distributions of the dataset. This graph would not be possible without the help of Skimr and Model Summary (@skimr, @modelsummary).
 
+## The Scatter Plots
+
+The scatter plots in Figure \@ref(fig:scatterplots) express the relationship between the response and the independent variables. In this cause the dispensary count and the type of business. The importance of the scatter plots is to help the reader visualize our findings and division of FSA's with the likelihood of having 3 or more dispensaries.
+
+## The Spatial Visualizations
+
+The spatial visualizations express visually how the FSA's are divided, the geographic location of a particular dispensary as well as the volume of particular businesses within a FSA. The map is divided by these forward sortation areas of Toronto from the year 2005[@UofTFSA]. The reason for the specific mentioning of the boundaries is because over time these FSA's can change but the team cannot find access to the new boundary geometries.
+
 ## The Model
 
 ### Before AIC
