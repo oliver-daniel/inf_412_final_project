@@ -14,7 +14,7 @@ output:
     number_sections: false
     fig_caption: true
     toc: true
-    toc_depth: 4
+    toc_depth: 2
   bookdown::html_document2:
     number_sections: false
     fig_caption: true
@@ -154,7 +154,7 @@ merged_counts <- left_join(
 )
 ```
 
-```{r scatterplots, fig.cap="The red horizontal line represents the delineation between class-0 and class-1 FSAs: the dots found above the line represent those FSAs which have at least 3 dispensaries, and vice versa."}
+```{r scatterplots, fig.cap="The red horizontal line represents the delineation between class-0 and class-1 FSAs: the dots found above the line represent those FSAs which have at least 3 dispensaries, and vice versa.", fig.height=11.5}
 merged_counts |>
   group_by(category) |>
   ggplot(aes(x = n.businesses, y = n.dispensaries)) +
@@ -177,7 +177,7 @@ fsas_by_category <- clean_fsas |>
   drop_na(category)
 ```
 
-```{r chloropleths, results="hide", fig.keep="all"}
+```{r chloropleths, results="hide", fig.keep="all", fig.cap="The green dots in each chloropleth map represent the location of dispensaries."}
 fsas_by_category |>
   group_by(category) |>
   do(plots = ggplot(.) +
@@ -209,9 +209,6 @@ fsas_by_category |>
     )) |>
   pull(plots)
 ```
-
-## Data Summary
-The summary statistics, shown below in Figure \@ref(tab:summary-table), express the distribution of the individual predictors across FSAs with the histogram bars on the side. The `unique` value explains the different kinds of categories within the predictors. What is interesting to note here is that some of the unique values repeat among the different groups. This may be indicative of double counting (i.e. a eating establishment also licensed as a retail food store). The data summary does a sufficient job in expressing the central tendency measures of the individual predictors which comes in handy when trying to understand distributions of the dataset. This graph would not be possible without the help of Skimr and Model Summary [cite skimr and cite model summary].
 
 <!-- TODO I don't know how to fix this spacing lol -->
 ```{r summary-table, fig.cap="Data Summary", fig.width=6}
@@ -300,6 +297,10 @@ print(fit)
 \newpage
 
 # Discussion
+
+## Data Summary
+
+The summary statistics, as shown in Figure \@ref(tab:summary-table), express the distribution of the individual predictors across FSAs with the histogram bars on the side. The `unique` value explains the different kinds of categories within the predictors. What is interesting to note here is that some of the unique values repeat among the different groups. This may be indicative of double counting (i.e. a eating establishment also licensed as a retail food store). The data summary does a sufficient job in expressing the central tendency measures of the individual predictors which comes in handy when trying to understand distributions of the dataset. This graph would not be possible without the help of Skimr and Model Summary [cite skimr and cite model summary].
 
 # Conclusion
 Our regression model indicates that at least certain types of businesses are significantly ($p < 0.05$) correlated to the likelihood of dispensaries being opened in an arbitrary FSA-sized region of Toronto. Simple improvements, such as reducing the dimensionality of the prediction space using AIC as a heuristic and K-fold Cross Validation, proved effective in improving predictive power to up to 85. Where higher numbers of dispensaries have already been opened, often the most densely populated regions of the city, co-location of multiple dispensaries in close proximity may indicate the longer-term stability of retail cannabis in those areas. However, statistical modelling can prove to be an effective tool in determining which geographic regions may be hospitable to a burgeoning cannabis market, inviting early investment and temporarily enjoying the dividends of low competition.
