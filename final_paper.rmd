@@ -278,7 +278,12 @@ summary(logistic_model2)
 
 # Improved logistic model
 tmp <- exp(coef(logistic_model2))
-print(tmp)
+
+data.frame(
+  `Exponentiated Coefficent` = round(tmp, 2)
+) |>
+  knitr::kable(caption = "Exponentiated coefficients represent the per-unit additive change in odds for each business type within an FSA.")
+
 ```
 
 ### K-fold cross-validation
