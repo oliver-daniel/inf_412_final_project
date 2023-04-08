@@ -13,7 +13,7 @@ output:
   bookdown::pdf_document2:
     number_sections: false
     fig_caption: true
-    # toc: true
+    toc: false
     toc_depth: 2
   bookdown::html_document2:
     number_sections: false
@@ -21,6 +21,7 @@ output:
   
 
 header-includes:
+  - \usepackage{longtable}
   - \usepackage{booktabs}
   - \usepackage{float}
   - \floatplacement{figure}{H}
@@ -90,7 +91,7 @@ Through the Open Data Toronto initiative, the City of Toronto offers to the publ
 The data were filtered again by the first letter of their postal code to limit addresses to those within the City of Toronto. However, this still resulted in `r n_distinct(clean_businesses$category)` different business categories. For the purpose of this paper, we limited our data to only `r length(desired_businesses)`:
 
 ```{r business-types}
-tibble(name = desired_businesses) |> knitr::kable()
+tibble(name = desired_businesses) |> knitr::kable(longtable = TRUE)
 ```
 
 For a total of `r fmt(nrow(clean_businesses))` suitable businesses. For each of these businesses, only the FSA and category were retained.
@@ -213,7 +214,7 @@ fsas_by_category |>
 ```
 
 <!-- TODO I don't know how to fix this spacing lol -->
-```{r summary-table, fig.cap="Data Summary", fig.width=6}
+```{r summary-table, fig.cap="Data Summary", fig.width=6, results="asis"}
 
 # Make a pivot table with counts of all features
 # inside each FSA
@@ -270,10 +271,11 @@ summary(logistic_model2)
 
 
 ### Exponentiate the coefficients
-```{r Twenty-four, fig.cap="Exponentiate the coefficients",fig.height=7, fig.width=12, echo=FALSE}
+```{r Twenty-four, fig.cap="Exponentiate the coefficients", results="asis"}
 
 # Improved logistic model
-exp(coef(logistic_model2))
+tmp <- exp(coef(logistic_model2))
+print(tmp)
 ```
 
 ### K-fold cross-validation
@@ -302,7 +304,7 @@ print(fit)
 
 ## Data Summary
 
-The summary statistics, as shown in Figure \@ref(tab:summary-table), express the distribution of the individual predictors across FSAs with the histogram bars on the side. The `unique` value explains the different kinds of categories within the predictors. What is interesting to note here is that some of the unique values repeat among the different groups. This may be indicative of double counting (i.e. a eating establishment also licensed as a retail food store). The data summary does a sufficient job in expressing the central tendency measures of the individual predictors which comes in handy when trying to understand distributions of the dataset. This graph would not be possible without the help of Skimr and Model Summary [cite skimr and cite model summary].
+The summary statistics, as shown in Figure \@ref(tab:summary-table), express the distribution of the individual predictors across FSAs with the histogram bars on the side. The `unique` value explains the different kinds of categories within the predictors. What is interesting to note here is that some of the unique values repeat among the different groups. This may be indicative of double counting (i.e. a eating establishment also licensed as a retail food store). The data summary does a sufficient job in expressing the central tendency measures of the individual predictors which comes in handy when trying to understand distributions of the dataset. This graph would not be possible without the help of Skimr and Model Summary (@skimr, @modelsummary).
 
 ## The Model
 
@@ -339,7 +341,10 @@ results_table <- coefs_2 |>
 For all other businesses, our updated model exhibits the following predicted changes to odds per unit. That is, for every -- say -- restaurant in an FSA, the likelihood of at least 3 dispensaries being open in that same FSA increase by 1%, to a high degree of statistical significance. Conversely, for every nightclub, the likelihood of the FSA being class-1 in terms of dispensary count decreases by about 15%, though this effect does not have as high a degree of significance with our data. See Table \@ref(tab:coefs-table) below:
 
 ```{r coefs-table}
-knitr::kable(results_table, caption = "Note that, despite the AIC optimizations, not all results are statistically significant with $\\alpha = 0.05.$")
+knitr::kable(results_table,
+  caption = "Note that, despite the AIC optimizations, not all results are statistically significant with $\\alpha = 0.05.$",
+  longtable = TRUE
+)
 ```
 
 
